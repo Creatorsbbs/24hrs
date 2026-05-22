@@ -680,6 +680,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🌐 UptimeRobot ativo na porta ${PORT}`);
 });
+
 // ================= MÚSICA =================
 client.on("messageCreate", async (message) => {
 
@@ -687,9 +688,7 @@ client.on("messageCreate", async (message) => {
 
   if (!message.content.startsWith("!play")) return;
 
-  const voiceChannel = message.guild.members.cache
-  .get(message.author.id)
-  ?.voice?.channel;
+  const voiceChannel = message.member.voice.channel;
 
   if (!voiceChannel) {
     return message.reply("❌ Entre em uma call.");
@@ -708,10 +707,13 @@ client.on("messageCreate", async (message) => {
     const connection = joinVoiceChannel({
       channelId: voiceChannel.id,
       guildId: message.guild.id,
-      adapterCreator: message.guild.voiceAdapterCreator
+      adapterCreator: message.guild.voiceAdapterCreator,
+      selfDeaf: false
     });
 
-    const search = await play.search(query, { limit: 1 });
+    const search = await play.search(query, {
+      limit: 1
+    });
 
     if (!search.length) {
       return message.reply("❌ Música não encontrada.");
@@ -725,11 +727,15 @@ client.on("messageCreate", async (message) => {
 
     connection.subscribe(player);
 
+    player.on("error", (err) => {
+      console.log("PLAYER ERROR:", err);
+    });
+
     message.reply(`🎶 Tocando: ${search[0].title}`);
 
   } catch (err) {
 
-    console.error("ERRO MÚSICA:", err);
+    console.log("ERRO PLAY:", err);
 
     message.reply("❌ Erro ao tocar música.");
   }
