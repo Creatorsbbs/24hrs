@@ -39,6 +39,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildVoiceStates,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers
   ]
@@ -716,9 +717,7 @@ client.on("messageCreate", async (message) => {
 
     const stream = await play.stream(search[0].url);
 
-    const resource = createAudioResource(stream.stream, {
-      inputType: stream.type
-    });
+    const resource = createAudioResource(stream.stream);
 
     player.play(resource);
 
