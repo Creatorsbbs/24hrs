@@ -684,7 +684,9 @@ client.on("messageCreate", async (message) => {
 
   if (!message.content.startsWith("!play")) return;
 
-  const voiceChannel = message.member.voice.channel;
+  const voiceChannel = message.guild.members.cache
+  .get(message.author.id)
+  ?.voice?.channel;
 
   if (!voiceChannel) {
     return message.reply("❌ Entre em uma call.");
