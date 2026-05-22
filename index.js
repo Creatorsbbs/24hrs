@@ -717,15 +717,9 @@ client.on("messageCreate", async (message) => {
       return message.reply("❌ Música não encontrada.");
     }
 
-    const stream = await play.stream(search[0].url, {
-  discordPlayerCompatibility: true
-});
+    const stream = await play.stream(search[0].url);
 
-    const resource = createAudioResource(stream.stream, {
-  inlineVolume: true
-});
-
-resource.volume.setVolume(1);
+    const resource = createAudioResource(stream.stream);
 
     player.play(resource);
 
@@ -735,7 +729,7 @@ resource.volume.setVolume(1);
 
   } catch (err) {
 
-    console.log(err);
+    console.error("ERRO MÚSICA:", err);
 
     message.reply("❌ Erro ao tocar música.");
   }
