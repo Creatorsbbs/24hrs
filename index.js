@@ -9,8 +9,18 @@ const {
   PermissionsBitField
 } = require("discord.js");
 
+const {
+  joinVoiceChannel,
+  createAudioPlayer,
+  createAudioResource
+} = require("@discordjs/voice");
+
+const play = require("play-dl");
+
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
+
+const player = createAudioPlayer();
 
 const extraRoles = [
   "1491095314550100100",
@@ -666,6 +676,60 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🌐 UptimeRobot ativo na porta ${PORT}`);
+});
+// ================= MÚSICA =================
+client.on("messageCreate", async (message) => {
+
+  if (message.author.bot) return;
+
+  if (!message.content.startsWith("!play")) return;
+
+  const voiceChannel = message.member.voice.channel;
+
+  if (!voiceChannel) {
+    return message.reply("❌ Entre em uma call.");
+  }
+
+  const args = message.content.split(" ").slice(1);
+
+  const query = args.join(" ");
+
+  if (!query) {
+    return message.reply("❌ Digite uma música.");
+  }
+
+  try {
+
+    const connection = joinVoiceChannel({
+      channelId: voiceChannel.id,
+      guildId: message.guild.id,
+      adapterCreator: message.guild.voiceAdapterCreator
+    });
+
+    const search = await play.search(query, { limit: 1 });
+
+    if (!search.length) {
+      return message.reply("❌ Música não encontrada.");
+    }
+
+    const stream = await play.stream(search[0].url);
+
+    const resource = createAudioResource(stream.stream, {
+      inputType: stream.type
+    });
+
+    player.play(resource);
+
+    connection.subscribe(player);
+
+    message.reply(`🎶 Tocando: ${search[0].title}`);
+
+  } catch (err) {
+
+    console.log(err);
+
+    message.reply("❌ Erro ao tocar música.");
+  }
 });
 
 // ================= LOGIN =================
