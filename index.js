@@ -17,6 +17,8 @@ const {
 
 const play = require("play-dl");
 
+const ffmpeg = require("ffmpeg-static");
+
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
@@ -715,9 +717,15 @@ client.on("messageCreate", async (message) => {
       return message.reply("❌ Música não encontrada.");
     }
 
-    const stream = await play.stream(search[0].url);
+    const stream = await play.stream(search[0].url, {
+  discordPlayerCompatibility: true
+});
 
-    const resource = createAudioResource(stream.stream);
+    const resource = createAudioResource(stream.stream, {
+  inlineVolume: true
+});
+
+resource.volume.setVolume(1);
 
     player.play(resource);
 
