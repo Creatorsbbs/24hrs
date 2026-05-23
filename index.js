@@ -19,6 +19,8 @@ const play = require("play-dl");
 
 const pontoSystem = require("./systems/pontoSystem");
 
+const limparSystem = require("./systems/limparSystem");
+
 const ffmpeg = require("ffmpeg-static");
 
 const { QuickDB } = require("quick.db");
@@ -173,6 +175,8 @@ client.on("interactionCreate", async (interaction) => {
   try {
 
     await pontoSystem(client, interaction);
+
+    await limparSystem(interaction);
     
     if (!interaction.isChatInputCommand()) return;
 
