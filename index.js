@@ -17,6 +17,8 @@ const {
 
 const play = require("play-dl");
 
+const pontoSystem = require("./systems/pontoSystem");
+
 const ffmpeg = require("ffmpeg-static");
 
 const { QuickDB } = require("quick.db");
