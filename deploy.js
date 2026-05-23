@@ -23,7 +23,21 @@ module.exports = async (client) => {
           .setName("usuario")
           .setDescription("Nome do jogador Roblox")
           .setRequired(true)
-      )
+      ),
+
+    // ================= PONTO =================
+
+    new SlashCommandBuilder()
+      .setName("ponto")
+      .setDescription("Inicia o ponto"),
+
+    new SlashCommandBuilder()
+      .setName("ranking")
+      .setDescription("Mostra ranking de horas"),
+
+    new SlashCommandBuilder()
+      .setName("meuponto")
+      .setDescription("Mostra suas horas")
   
   ].map(cmd => cmd.toJSON());
 
