@@ -172,6 +172,8 @@ client.on("interactionCreate", async (interaction) => {
 
   try {
 
+    await pontoSystem(client, interaction);
+    
     if (!interaction.isChatInputCommand()) return;
 
     await skinCommand(interaction);
