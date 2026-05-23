@@ -4,6 +4,8 @@ const {
   EmbedBuilder
 } = require("discord.js");
 
+  const { createCanvas, loadImage } = require("@napi-rs/canvas");
+  
 const Database = require("better-sqlite3");
 
 // ======================================================
@@ -169,6 +171,53 @@ function checkLevelUp(userId) {
 
 }
 
+  /* ======================================================
+   🖼️ SISTEMA DE PERFIL EM IMAGEM (ESTILO ZANY)
+   👉 Essa função cria a imagem do comando !perfil
+====================================================== */
+
+async function createProfileImage(user, data) {
+
+  const canvas = createCanvas(900, 300);
+  const ctx = canvas.getContext("2d");
+
+  // fundo do card
+  ctx.fillStyle = "#0f0f1a";
+  ctx.fillRect(0, 0, 900, 300);
+
+  // painel principal
+  ctx.fillStyle = "#1e1e2e";
+  ctx.fillRect(20, 20, 860, 260);
+
+  // nome do usuário
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 40px Arial";
+  ctx.fillText(user.username, 180, 80);
+
+  // informações da economia
+  ctx.font = "25px Arial";
+  ctx.fillText(`💰 Carteira: ${data.wallet}`, 180, 140);
+  ctx.fillText(`🏦 Banco: ${data.bank}`, 180, 180);
+  ctx.fillText(`⭐ Level: ${data.level}`, 180, 220);
+
+  // avatar do usuário
+  const avatar = await loadImage(
+    user.displayAvatarURL({ extension: "png" })
+  );
+
+  // círculo do avatar
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(90, 150, 60, 0, Math.PI * 2);
+  ctx.clip();
+
+  ctx.drawImage(avatar, 30, 90, 120, 120);
+
+  ctx.restore();
+
+  return canvas.toBuffer("image/png");
+    }
+
 // ======================================================
 //                SISTEMA DE COMANDOS
 // ======================================================
@@ -197,32 +246,13 @@ if (command === "perfil") {
     "SELECT * FROM users WHERE userId = ?"
   ).get(message.author.id);
 
-  const needXp = user.level * 100;
-
-  const embed = new EmbedBuilder()
-    .setColor("#00ff88")
-    .setAuthor({
-      name: `${message.author.username}`,
-      iconURL: message.author.displayAvatarURL()
-    })
-    .setThumbnail(message.author.displayAvatarURL())
-    .setTitle("👑 Perfil Econômico")
-    .setDescription(
-`💰 **Carteira:** ${user.wallet}
-🏦 **Banco:** ${user.bank}
-
-⭐ **Level:** ${user.level}
-⚡ **XP:** ${user.xp}/${needXp}
-
-🔋 **Energia:** ${user.energy}%`
-    )
-    .setFooter({
-      text: "Sistema de Economia"
-    })
-    .setTimestamp();
+  const img = await createProfileImage(message.author, user);
 
   return message.reply({
-    embeds: [embed]
+    files: [{
+      attachment: img,
+      name: "perfil.png"
+    }]
   });
 
 }
