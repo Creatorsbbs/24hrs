@@ -37,7 +37,43 @@ module.exports = async (client) => {
 
     new SlashCommandBuilder()
       .setName("meuponto")
-      .setDescription("Mostra suas horas")
+      .setDescription("Mostra suas horas"),
+
+    // ================= LIMPAR PONTOS =================
+
+    new SlashCommandBuilder()
+      .setName("limparpontos")
+      .setDescription("Limpa registros de ponto")
+      .addStringOption(option =>
+        option
+          .setName("periodo")
+          .setDescription("Escolha o período")
+          .setRequired(true)
+          .addChoices(
+            {
+              name: "Dia",
+              value: "dia"
+            },
+            {
+              name: "Semana",
+              value: "semana"
+            },
+            {
+              name: "Mês",
+              value: "mes"
+            },
+            {
+              name: "Tudo",
+              value: "tudo"
+            }
+          )
+      )
+      .addUserOption(option =>
+        option
+          .setName("usuario")
+          .setDescription("Usuário específico")
+          .setRequired(false)
+      )
   
   ].map(cmd => cmd.toJSON());
 
