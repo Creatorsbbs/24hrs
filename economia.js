@@ -407,6 +407,162 @@ if (command === "saldo") {
 
 }
 
+  // ======================================================
+//                COMANDO DEPOSITAR
+// ======================================================
+
+if (
+  command === "depositar" ||
+  command === "dep"
+) {
+
+  const value = args[0];
+
+  const user = db.prepare(
+    "SELECT * FROM users WHERE userId = ?"
+  ).get(message.author.id);
+
+  let amount;
+
+  // ================= ALL =================
+
+  if (
+    value === "all" ||
+    value === "tudo"
+  ) {
+
+    amount = user.wallet;
+
+  } else {
+
+    amount = Number(value);
+
+  }
+
+  // ================= VALIDAÇÃO =================
+
+  if (!amount || amount <= 0) {
+
+    return message.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor("Red")
+          .setTitle("❌ Valor inválido")
+          .setDescription(
+            "Digite um valor válido para depositar."
+          )
+      ]
+    });
+
+  }
+
+  if (user.wallet < amount) {
+
+    return message.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor("Red")
+          .setTitle("❌ Dinheiro insuficiente")
+          .setDescription(
+            "Você não possui tudo isso na carteira."
+          )
+      ]
+    });
+
+  }
+
+  // ================= UPDATE =================
+
+  db.prepare(`
+    UPDATE users
+    SET wallet = wallet - ?,
+        bank = bank + ?
+    WHERE userId = ?
+  `).run(
+    amount,
+    amount,
+    message.author.id
+  );
+
+  // ================= EMBED =================
+
+  const embed = new EmbedBuilder()
+    .setColor("#0099ff")
+    .setTitle("🏦 Depósito realizado")
+    .setThumbnail(message.author.displayAvatarURL())
+    .setDescription(
+`💸 Valor depositado:
+**${amount} moedas**
+
+👛 Carteira atual:
+**${user.wallet - amount}**
+
+🏦 Banco atual:
+**${user.bank + amount}**`
+    )
+    .setFooter({
+      text: `${message.author.username}`
+    })
+    .setTimestamp();
+
+  return message.reply({
+    embeds: [embed]
+  });
+
+}
+
+  // ======================================================
+//                  COMANDO SACAR
+// ======================================================
+
+if (command === "sacar") {
+
+  const amount = Number(args[0]);
+
+  if (!amount || amount <= 0) {
+
+    return message.reply("❌ Valor inválido.");
+
+  }
+
+  const user = db.prepare(
+    "SELECT * FROM users WHERE userId = ?"
+  ).get(message.author.id);
+
+  if (user.bank < amount) {
+
+    return message.reply(
+      "❌ Você não possui isso no banco."
+    );
+
+  }
+
+  db.prepare(`
+    UPDATE users
+    SET bank = bank - ?,
+        wallet = wallet + ?
+    WHERE userId = ?
+  `).run(
+    amount,
+    amount,
+    message.author.id
+  );
+
+  const embed = new EmbedBuilder()
+    .setColor("Green")
+    .setTitle("💸 Saque realizado")
+    .setDescription(
+`🏦 Valor sacado: **${amount} moedas**`
+    )
+    .setThumbnail(message.author.displayAvatarURL())
+    .setTimestamp();
+
+  return message.reply({
+    embeds: [embed]
+  });
+
+}
+  
 // ======================================================
 //                    COMANDO PAY
 // ======================================================
