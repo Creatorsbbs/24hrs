@@ -53,6 +53,8 @@ const client = new Client({
 
 require("./forca")(client);
 
+require("./economia")(client);
+
 require("./deploy")(client);
 
 const skinCommand = require("./skin");
