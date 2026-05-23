@@ -73,7 +73,19 @@ module.exports = async (client) => {
           .setName("usuario")
           .setDescription("Usuário específico")
           .setRequired(false)
-      )
+      ),
+
+    // ================= LIMPAR =================
+
+new SlashCommandBuilder()
+  .setName("limpar")
+  .setDescription("Limpa mensagens do canal")
+  .addIntegerOption(option =>
+    option
+      .setName("quantidade")
+      .setDescription("Quantidade de mensagens")
+      .setRequired(true)
+  )
   
   ].map(cmd => cmd.toJSON());
 
