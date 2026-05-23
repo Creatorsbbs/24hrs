@@ -304,6 +304,74 @@ ${interaction.user}
   }
 
   // =====================================================
+  // /LIMPARPONTOS
+  // =====================================================
+
+  if (
+    interaction.isChatInputCommand() &&
+    interaction.commandName === "limparpontos"
+  ) {
+
+    const periodo =
+      interaction.options.getString("periodo");
+
+    const usuario =
+      interaction.options.getUser("usuario");
+
+    // ================= USUÁRIO ESPECÍFICO =================
+
+    if (usuario) {
+
+      await db.delete(
+        `total_${usuario.id}`
+      );
+
+      return interaction.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setColor("Red")
+            .setTitle("🗑️ Registro Limpo")
+            .setDescription(`
+### 👤 Usuário
+${usuario}
+
+### 📅 Período
+${periodo}
+
+✅ Os registros foram apagados.
+`)
+        ]
+      });
+    }
+
+    // ================= TODOS =================
+
+    const all = await db.all();
+
+    const totals = all.filter(d =>
+      d.id.startsWith("total_")
+    );
+
+    for (const item of totals) {
+      await db.delete(item.id);
+    }
+
+    return interaction.reply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor("Red")
+          .setTitle("🗑️ Todos Registros Limpos")
+          .setDescription(`
+### 📅 Período
+${periodo}
+
+✅ Todos os registros foram apagados.
+`)
+      ]
+    });
+  }
+
+  // =====================================================
   // BOTÕES
   // =====================================================
 
