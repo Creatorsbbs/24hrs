@@ -177,46 +177,63 @@ function checkLevelUp(userId) {
 ====================================================== */
 
 async function createProfileImage(user, data) {
-
   const canvas = createCanvas(900, 300);
   const ctx = canvas.getContext("2d");
 
-  // fundo do card
-  ctx.fillStyle = "#0f0f1a";
+  // 🎨 FUNDO GRADIENTE
+  const gradient = ctx.createLinearGradient(0, 0, 900, 300);
+  gradient.addColorStop(0, "#0b0f1a");
+  gradient.addColorStop(1, "#1a1f2e");
+
+  ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 900, 300);
 
-  // painel principal
-  ctx.fillStyle = "#1e1e2e";
+  // 🧊 CARD CENTRAL
+  ctx.fillStyle = "rgba(255,255,255,0.05)";
   ctx.fillRect(20, 20, 860, 260);
 
-  // nome do usuário
+  // 🧠 NOME
   ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 40px Arial";
-  ctx.fillText(user.username, 180, 80);
+  ctx.font = "bold 42px Arial";
+  ctx.fillText(user.username, 180, 90);
 
-  // informações da economia
-  ctx.font = "25px Arial";
-  ctx.fillText(`💰 Carteira: ${data.wallet}`, 180, 140);
-  ctx.fillText(`🏦 Banco: ${data.bank}`, 180, 180);
-  ctx.fillText(`⭐ Level: ${data.level}`, 180, 220);
+  // 💰 INFO
+  ctx.font = "28px Arial";
+  ctx.fillStyle = "#00ff88";
+  ctx.fillText(`💰 ${data.wallet}`, 180, 150);
 
-  // avatar do usuário
+  ctx.fillStyle = "#00b7ff";
+  ctx.fillText(`🏦 ${data.bank}`, 180, 190);
+
+  ctx.fillStyle = "#ffd700";
+  ctx.fillText(`⭐ Level ${data.level}`, 180, 230);
+
+  // 🖼️ AVATAR
   const avatar = await loadImage(
-    user.displayAvatarURL({ extension: "png" })
+    user.displayAvatarURL({ extension: "png", size: 256 })
   );
 
-  // círculo do avatar
+  // círculo com borda
   ctx.save();
+
   ctx.beginPath();
-  ctx.arc(90, 150, 60, 0, Math.PI * 2);
+  ctx.arc(100, 150, 70, 0, Math.PI * 2);
+  ctx.closePath();
   ctx.clip();
 
-  ctx.drawImage(avatar, 30, 90, 120, 120);
+  ctx.drawImage(avatar, 30, 80, 140, 140);
 
   ctx.restore();
 
+  // 🔵 BORDA DO AVATAR
+  ctx.beginPath();
+  ctx.arc(100, 150, 72, 0, Math.PI * 2);
+  ctx.strokeStyle = "#00ff88";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
   return canvas.toBuffer("image/png");
-    }
+}
 
 // ======================================================
 //                SISTEMA DE COMANDOS
