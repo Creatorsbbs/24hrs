@@ -1,3 +1,6 @@
+// ================= SISTEMA PROFISSIONAL DE BATE-PONTO =================
+// 📁 systems/pontoSystem.js
+
 const {
   EmbedBuilder,
   ActionRowBuilder,
@@ -9,71 +12,221 @@ const { QuickDB } = require("quick.db");
 
 const db = new QuickDB();
 
+// ================= FORMATADOR =================
+
+function formatDuration(ms) {
+
+  const segundos = Math.floor(ms / 1000) % 60;
+  const minutos = Math.floor(ms / 60000) % 60;
+  const horas = Math.floor(ms / 3600000);
+
+  return `${horas}h ${minutos}m ${segundos}s`;
+}
+
+function discordTime(ms) {
+  return `<t:${Math.floor(ms / 1000)}:F>`;
+}
+
+// ================= EMBED ATIVA =================
+
+function createLiveEmbed(user, data) {
+
+  let total = Date.now() - data.start;
+
+  total -= data.pauseTotal || 0;
+
+  if (data.pausado) {
+    total -= (Date.now() - data.pauseStart);
+  }
+
+  const status = data.pausado
+    ? "⏸️ Pausado"
+    : "🟢 Em Serviço";
+
+  return new EmbedBuilder()
+    .setColor("#2b2d31")
+    .setTitle("⏳ • Sistema de Bate-Ponto")
+    .setDescription(`
+### 👤 Usuário
+${user}
+
+### 📅 Início
+${discordTime(data.start)}
+
+### 📊 Status
+${status}
+
+### ⏰ Tempo Atual
+\`${formatDuration(total)}\`
+
+### ⚡ Sistema automático ativo
+`)
+    .setThumbnail(user.displayAvatarURL())
+    .setFooter({
+      text: "Sistema profissional de ponto"
+    })
+    .setTimestamp();
+}
+
+// ================= EMBED FINAL =================
+
+function createFinalEmbed(user, data, total) {
+
+  return new EmbedBuilder()
+    .setColor("#111214")
+    .setTitle("📁 • Registro Finalizado")
+    .setDescription(`
+Use /reabrir para abrir este ponto novamente.
+
+### 👤 Usuário
+${user}
+
+### 📅 Início
+${discordTime(data.start)}
+
+### 🛑 Término
+${discordTime(Date.now())}
+
+### ⏰ Tempo Total
+\`${formatDuration(total)}\`
+
+### ✅ Ponto encerrado com sucesso
+`)
+    .setThumbnail(user.displayAvatarURL())
+    .setFooter({
+      text: "Sistema profissional de ponto"
+    })
+    .setTimestamp();
+}
+
+// ================= BOTÕES =================
+
+function createButtons(pausado = false) {
+
+  return new ActionRowBuilder()
+    .addComponents(
+
+      new ButtonBuilder()
+        .setCustomId("ponto_pause")
+        .setLabel("Pausar")
+        .setEmoji("⏸️")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(pausado),
+
+      new ButtonBuilder()
+        .setCustomId("ponto_resume")
+        .setLabel("Retomar")
+        .setEmoji("▶️")
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(!pausado),
+
+      new ButtonBuilder()
+        .setCustomId("ponto_stop")
+        .setLabel("Encerrar")
+        .setEmoji("🛑")
+        .setStyle(ButtonStyle.Danger)
+    );
+}
+
+// ================= EXPORT =================
+
 module.exports = async (client, interaction) => {
 
-  // ================= /PONTO =================
+  // =====================================================
+  // /PONTO
+  // =====================================================
 
   if (
     interaction.isChatInputCommand() &&
     interaction.commandName === "ponto"
   ) {
 
-    const ja =
+    const active =
       await db.get(`ponto_${interaction.user.id}`);
 
-    if (ja) {
+    if (active) {
 
       return interaction.reply({
-        content: "❌ Você já iniciou ponto.",
+        content: "❌ Você já possui um ponto aberto.",
         ephemeral: true
       });
     }
 
+    const data = {
+      start: Date.now(),
+      pausado: false,
+      pauseTotal: 0,
+      pauseStart: null
+    };
+
     await db.set(
       `ponto_${interaction.user.id}`,
+      data
+    );
+
+    const embed =
+      createLiveEmbed(interaction.user, data);
+
+    const row =
+      createButtons(false);
+
+    const msg =
+      await interaction.reply({
+        embeds: [embed],
+        components: [row],
+        fetchReply: true
+      });
+
+    await db.set(
+      `ponto_msg_${interaction.user.id}`,
       {
-        start: Date.now(),
-        pausado: false,
-        pauseTotal: 0
+        channelId: msg.channel.id,
+        messageId: msg.id
       }
     );
 
-    const embed = new EmbedBuilder()
-      .setTitle("⏰ Sistema de Ponto")
-      .setColor("Blue")
-      .setDescription(
-        "Seu ponto foi iniciado."
-      );
+    // ================= AUTO UPDATE =================
 
-    const row = new ActionRowBuilder()
-      .addComponents(
+    const interval = setInterval(async () => {
 
-        new ButtonBuilder()
-          .setCustomId("pause")
-          .setLabel("Pausar")
-          .setEmoji("⏸️")
-          .setStyle(ButtonStyle.Secondary),
+      const latest =
+        await db.get(`ponto_${interaction.user.id}`);
 
-        new ButtonBuilder()
-          .setCustomId("resume")
-          .setLabel("Despausar")
-          .setEmoji("▶️")
-          .setStyle(ButtonStyle.Success),
+      if (!latest) {
+        clearInterval(interval);
+        return;
+      }
 
-        new ButtonBuilder()
-          .setCustomId("stop")
-          .setLabel("Encerrar")
-          .setEmoji("🔴")
-          .setStyle(ButtonStyle.Danger)
-      );
+      try {
 
-    return interaction.reply({
-      embeds: [embed],
-      components: [row]
-    });
+        const channel =
+          await client.channels.fetch(msg.channel.id);
+
+        const message =
+          await channel.messages.fetch(msg.id);
+
+        await message.edit({
+          embeds: [
+            createLiveEmbed(
+              interaction.user,
+              latest
+            )
+          ],
+          components: [
+            createButtons(latest.pausado)
+          ]
+        });
+
+      } catch {
+        clearInterval(interval);
+      }
+
+    }, 5000);
   }
 
-  // ================= /MEUPONTO =================
+  // =====================================================
+  // /MEUPONTO
+  // =====================================================
 
   if (
     interaction.isChatInputCommand() &&
@@ -83,19 +236,29 @@ module.exports = async (client, interaction) => {
     const total =
       await db.get(`total_${interaction.user.id}`) || 0;
 
-    const horas =
-      Math.floor(total / 3600000);
+    const embed = new EmbedBuilder()
+      .setColor("#2b2d31")
+      .setTitle("📊 • Seu Ranking")
+      .setDescription(`
+### 👤 Usuário
+${interaction.user}
 
-    const minutos =
-      Math.floor((total % 3600000) / 60000);
+### ⏰ Tempo Total
+\`${formatDuration(total)}\`
+`)
+      .setThumbnail(
+        interaction.user.displayAvatarURL()
+      )
+      .setTimestamp();
 
     return interaction.reply({
-      content:
-        `⏰ Você possui ${horas}h ${minutos}m`
+      embeds: [embed]
     });
   }
 
-  // ================= /RANKING =================
+  // =====================================================
+  // /RANKING
+  // =====================================================
 
   if (
     interaction.isChatInputCommand() &&
@@ -105,8 +268,8 @@ module.exports = async (client, interaction) => {
     const all = await db.all();
 
     const ranking = all
-      .filter(x =>
-        x.id.startsWith("total_")
+      .filter(d =>
+        d.id.startsWith("total_")
       )
       .sort((a, b) =>
         b.value - a.value
@@ -123,119 +286,150 @@ module.exports = async (client, interaction) => {
       const user =
         await client.users.fetch(userId);
 
-      const horas =
-        Math.floor(ranking[i].value / 3600000);
-
       desc +=
-        `**${i + 1}.** ${user.username} - ${horas}h\n`;
+        `**${i + 1}.** ${user} — \`${formatDuration(ranking[i].value)}\`\n`;
     }
 
     const embed = new EmbedBuilder()
-      .setTitle("🏆 Ranking")
-      .setDescription(desc)
-      .setColor("Gold");
+      .setColor("#2b2d31")
+      .setTitle("🏆 • Ranking de Horas")
+      .setDescription(
+        desc || "Sem dados."
+      )
+      .setTimestamp();
 
     return interaction.reply({
       embeds: [embed]
     });
   }
 
-  // ================= BOTÕES =================
+  // =====================================================
+  // BOTÕES
+  // =====================================================
 
-  if (interaction.isButton()) {
+  if (!interaction.isButton()) return;
 
-    const data =
-      await db.get(`ponto_${interaction.user.id}`);
+  if (
+    ![
+      "ponto_pause",
+      "ponto_resume",
+      "ponto_stop"
+    ].includes(interaction.customId)
+  ) return;
 
-    if (!data) return;
+  const data =
+    await db.get(`ponto_${interaction.user.id}`);
 
-    // PAUSE
-    if (interaction.customId === "pause") {
+  if (!data) {
 
-      if (data.pausado) {
+    return interaction.reply({
+      content: "❌ Você não possui ponto ativo.",
+      ephemeral: true
+    });
+  }
 
-        return interaction.reply({
-          content: "❌ Já pausado.",
-          ephemeral: true
-        });
-      }
+  // ================= PAUSE =================
 
-      data.pausado = true;
-      data.pauseStart = Date.now();
+  if (interaction.customId === "ponto_pause") {
 
-      await db.set(
-        `ponto_${interaction.user.id}`,
-        data
-      );
+    if (data.pausado) {
 
       return interaction.reply({
-        content: "⏸️ Ponto pausado.",
+        content: "❌ Seu ponto já está pausado.",
         ephemeral: true
       });
     }
 
-    // RESUME
-    if (interaction.customId === "resume") {
+    data.pausado = true;
+    data.pauseStart = Date.now();
 
-      if (!data.pausado) {
+    await db.set(
+      `ponto_${interaction.user.id}`,
+      data
+    );
 
-        return interaction.reply({
-          content: "❌ Você não está pausado.",
-          ephemeral: true
-        });
-      }
+    return interaction.update({
+      embeds: [
+        createLiveEmbed(
+          interaction.user,
+          data
+        )
+      ],
+      components: [
+        createButtons(true)
+      ]
+    });
+  }
 
-      const pauseTime =
-        Date.now() - data.pauseStart;
+  // ================= RESUME =================
 
-      data.pauseTotal += pauseTime;
+  if (interaction.customId === "ponto_resume") {
 
-      data.pausado = false;
-
-      await db.set(
-        `ponto_${interaction.user.id}`,
-        data
-      );
+    if (!data.pausado) {
 
       return interaction.reply({
-        content: "▶️ Ponto retomado.",
+        content: "❌ Seu ponto não está pausado.",
         ephemeral: true
       });
     }
 
-    // STOP
-    if (interaction.customId === "stop") {
+    const pausedTime =
+      Date.now() - data.pauseStart;
 
-      let total =
-        Date.now() - data.start;
+    data.pauseTotal += pausedTime;
 
-      total -= data.pauseTotal;
+    data.pausado = false;
+    data.pauseStart = null;
 
-      if (data.pausado) {
+    await db.set(
+      `ponto_${interaction.user.id}`,
+      data
+    );
 
-        total -=
-          (Date.now() - data.pauseStart);
-      }
+    return interaction.update({
+      embeds: [
+        createLiveEmbed(
+          interaction.user,
+          data
+        )
+      ],
+      components: [
+        createButtons(false)
+      ]
+    });
+  }
 
-      await db.add(
-        `total_${interaction.user.id}`,
-        total
-      );
+  // ================= STOP =================
 
-      await db.delete(
-        `ponto_${interaction.user.id}`
-      );
+  if (interaction.customId === "ponto_stop") {
 
-      const horas =
-        Math.floor(total / 3600000);
+    let total =
+      Date.now() - data.start;
 
-      const minutos =
-        Math.floor((total % 3600000) / 60000);
+    total -= data.pauseTotal;
 
-      return interaction.reply({
-        content:
-          `🔴 Ponto encerrado.\n⏰ ${horas}h ${minutos}m`
-      });
+    if (data.pausado) {
+      total -= (Date.now() - data.pauseStart);
     }
+
+    await db.add(
+      `total_${interaction.user.id}`,
+      total
+    );
+
+    await db.delete(
+      `ponto_${interaction.user.id}`
+    );
+
+    return interaction.update({
+      embeds: [
+        createFinalEmbed(
+          interaction.user,
+          data,
+          total
+        )
+      ],
+      components: []
+    });
   }
 };
