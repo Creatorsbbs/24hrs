@@ -22,11 +22,19 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor("#00ff88")
-      .setTitle("🎉 Novo membro entrou!")
+      .setTitle("Vamo que vamo💥💥🔊🔊!")
       .setDescription(
-        `👋 Olá ${member}\n\n` +
-        `Seja bem-vindo ao servidor **${member.guild.name}**!\n` +
-        `Aproveite, leia as regras e divirta-se 🚀`
+        `${member}\n\n` +
+        `🔊・Bem-vindo ao BATIDÃO BR 🇧🇷
+
+Prepare-se pro grave pesado, resenha insana e a melhor vibe BR do Roblox! 🎧🔥
+
+👑 Respeite todos da comunidade
+🔊 Curta o paredão
+🎶 Entre na vibe da tropa
+⚡ Mostre seu estilo no baile
+
+💚 Aproveite sua estadia e fortaleça o BATIDÃO BR!`
       )
       .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 1024 }))
       
