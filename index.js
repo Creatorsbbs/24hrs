@@ -225,7 +225,7 @@ Explique sua situação com o máximo de detalhes possível para agilizar o aten
         new ButtonBuilder()
           .setCustomId("ticket_suporte")
           .setLabel("💬 Suporte")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Success),
 
         new ButtonBuilder()
           .setCustomId("ticket_vendas")
