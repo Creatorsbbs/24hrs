@@ -216,7 +216,7 @@ Propostas de parceria, divulgação ou colaboração entre servidores.
 📌 Importante:
 Explique sua situação com o máximo de detalhes possível para agilizar o atendimento.
 `)
-        .setColor("#3aa3e7")
+        .setColor("#0ff88")
         .setImage("https://cdn.discordapp.com/attachments/1500914111725436992/1507923935516168232/file_00000000ab5071f9b33b3d5a761a07e3.png?ex=6a13ab1a&is=6a12599a&hm=834ce535cbd7c944e53c785597f1481ec34ba7f23198f1c5405947b732c89607&")
         .setThumbnail("https://cdn.discordapp.com/attachments/1500914111725436992/1507923935516168232/file_00000000ab5071f9b33b3d5a761a07e3.png?ex=6a13ab1a&is=6a12599a&hm=834ce535cbd7c944e53c785597f1481ec34ba7f23198f1c5405947b732c89607&");
 
@@ -371,7 +371,7 @@ Seu ticket foi criado com sucesso e nossa equipe já foi notificada.
 
 ✨ Equipe de Suporte
 `)
-        .setColor("#3aa3e7")
+        .setColor("#0ff88")
         .setImage("https://cdn.discordapp.com/attachments/1500914111725436992/1507923935516168232/file_00000000ab5071f9b33b3d5a761a07e3.png?ex=6a13ab1a&is=6a12599a&hm=834ce535cbd7c944e53c785597f1481ec34ba7f23198f1c5405947b732c89607&")
         .setThumbnail("https://cdn.discordapp.com/attachments/1500914111725436992/1507923935516168232/file_00000000ab5071f9b33b3d5a761a07e3.png?ex=6a13ab1a&is=6a12599a&hm=834ce535cbd7c944e53c785597f1481ec34ba7f23198f1c5405947b732c89607&");
 
