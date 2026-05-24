@@ -23,6 +23,8 @@ const play = require("play-dl");
 
 const pontoSystem = require("./systems/pontoSystem");
 
+const logs = require("./logs");
+
 const limparSystem = require("./systems/limparSystem");
 
 const ffmpeg = require("ffmpeg-static");
@@ -71,6 +73,8 @@ const skinCommand = require("./skin");
 client.once("clientReady", async () => {
   console.log(`🤖 Online como ${client.user.tag}`);
 
+  logs(client);
+  
   client.guilds.cache.forEach(guild => {
   setupServer(guild);
  });
