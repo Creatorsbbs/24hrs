@@ -6,7 +6,7 @@ module.exports = {
   async execute(member) {
 
     // ID do canal de entrada
-    const canalID = "ID_DO_CANAL";
+    const canalID = "1500216201031450672";
 
     // ID do cargo automático
     const cargoID = "ID_DO_CARGO";
@@ -31,7 +31,7 @@ module.exports = {
       .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 1024 }))
       
       // Banner/imagem grande
-      .setImage("LINK_DA_IMAGEM_AQUI")
+      .setImage("https://cdn.discordapp.com/attachments/1500914111725436992/1507923935516168232/file_00000000ab5071f9b33b3d5a761a07e3.png?ex=6a13ab1a&is=6a12599a&hm=834ce535cbd7c944e53c785597f1481ec34ba7f23198f1c5405947b732c89607&")
 
       .setFooter({
         text: `Agora temos ${member.guild.memberCount} membros`
