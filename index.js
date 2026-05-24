@@ -66,7 +66,7 @@ require("./deploy")(client);
 const skinCommand = require("./skin");
 
 // ================= START =================
-client.once("ready", async () => {
+client.once("clientReady", async () => {
   console.log(`🤖 Online como ${client.user.tag}`);
 
   client.guilds.cache.forEach(guild => {
@@ -192,7 +192,9 @@ client.on("interactionCreate", async (interaction) => {
     
     if (interaction.commandName === "painel") {
 
-      await interaction.deferReply();
+      await interaction.deferReply({
+  flags: 64
+});
 
       const embed = new EmbedBuilder()
         .setTitle("🎫 CENTRAL DE ATENDIMENTO")
