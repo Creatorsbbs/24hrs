@@ -9,7 +9,7 @@ module.exports = {
     const canalID = "1500216201031450672";
 
     // ID do cargo automático
-    const cargoID = "ID_DO_CARGO";
+    const cargoID = "1500216200485928961";
 
     const canal = member.guild.channels.cache.get(canalID);
 
