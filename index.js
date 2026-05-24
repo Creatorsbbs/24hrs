@@ -230,17 +230,17 @@ Explique sua situação com o máximo de detalhes possível para agilizar o aten
         new ButtonBuilder()
           .setCustomId("ticket_vendas")
           .setLabel("💰 Vendas")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Sucess),
 
         new ButtonBuilder()
           .setCustomId("ticket_denuncia")
           .setLabel("🚨 Denúncia")
-          .setStyle(ButtonStyle.Primary),
+          .setStyle(ButtonStyle.Sucess),
 
         new ButtonBuilder()
           .setCustomId("ticket_parceria")
           .setLabel("🤝 Parceria")
-          .setStyle(ButtonStyle.Primary)
+          .setStyle(ButtonStyle.Sucess)
       );
 
       return interaction.editReply({
@@ -527,7 +527,7 @@ Sua ticket recebeu uma nova resposta da equipe.
 
 Volte ao servidor para continuar o atendimento.
 `)
-        .setColor("#3aa3e7")
+        .setColor("#00ff88")
         .setTimestamp();
 
       await ticketUser.send({
@@ -566,7 +566,7 @@ Volte ao servidor para continuar o atendimento.
 
     const embed = new EmbedBuilder()
       .setTitle("🔒 Ticket Fechado")
-      .setColor("Red")
+      .setColor("#00ff88")
       .addFields(
         {
           name: "🏠 Servidor",
