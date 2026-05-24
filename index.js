@@ -15,6 +15,10 @@ const {
   createAudioResource
 } = require("@discordjs/voice");
 
+const fs = require("fs");
+
+const path = require("path");
+
 const play = require("play-dl");
 
 const pontoSystem = require("./systems/pontoSystem");
