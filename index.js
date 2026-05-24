@@ -191,8 +191,6 @@ client.on("interactionCreate", async (interaction) => {
     await skinCommand(interaction);
     
     if (interaction.commandName === "painel") {
-
-      await interaction.deferReply();
       
       const embed = new EmbedBuilder()
         .setTitle("🎫 CENTRAL DE ATENDIMENTO")
@@ -243,7 +241,7 @@ Explique sua situação com o máximo de detalhes possível para agilizar o aten
           .setStyle(ButtonStyle.Success)
       );
 
-      return interaction.editReply({
+      return interaction.reply({
         embeds: [embed],
         components: [row]
       });
