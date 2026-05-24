@@ -230,17 +230,17 @@ Explique sua situação com o máximo de detalhes possível para agilizar o aten
         new ButtonBuilder()
           .setCustomId("ticket_vendas")
           .setLabel("💰 Vendas")
-          .setStyle(ButtonStyle.Sucess),
+          .setStyle(ButtonStyle.Success),
 
         new ButtonBuilder()
           .setCustomId("ticket_denuncia")
           .setLabel("🚨 Denúncia")
-          .setStyle(ButtonStyle.Sucess),
+          .setStyle(ButtonStyle.Success),
 
         new ButtonBuilder()
           .setCustomId("ticket_parceria")
           .setLabel("🤝 Parceria")
-          .setStyle(ButtonStyle.Sucess)
+          .setStyle(ButtonStyle.Success)
       );
 
       return interaction.editReply({
@@ -279,11 +279,13 @@ client.on("interactionCreate", async (interaction) => {
 
     const alreadyOpen = [...ticketOwners.values()].includes(user.id);
 
-  if (alreadyOpen) {
-    return interaction.editReply({
-      content: "❌ Você já tem um ticket aberto."
-    });
-  }
+if (alreadyOpen) {
+
+  return interaction.reply({
+    content: "❌ Você já tem um ticket aberto.",
+    flags: 64
+  });
+}
 
   try {
 
