@@ -59,6 +59,8 @@ const client = new Client({
 
 require("./forca")(client);
 
+require("./events/inviteTracker")(client);
+
 require("./economia")(client);
 
 require("./deploy")(client);
