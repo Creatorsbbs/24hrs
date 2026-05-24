@@ -21,7 +21,7 @@ module.exports = async (client) => {
       oldInvites.get(inv.code)?.uses < inv.uses
     );
 
-    const canal = member.guild.channels.cache.get("ID_DO_CANAL");
+    const canal = member.guild.channels.cache.get("1500216201635299369");
 
     if (!usedInvite) {
       return canal.send(
