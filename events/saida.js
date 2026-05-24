@@ -12,10 +12,14 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setColor("#ff0000")
-      .setTitle("😢 Membro saiu")
+      .setTitle("Som estorou os tímpanos dele 🤣🤣")
       .setDescription(
-        `🚪 ${member.user.tag} saiu do servidor...\n\n` +
-        `Esperamos te ver novamente algum dia 💔`
+        ` 💢・${member.user.tag} quitou do BATIDÃO BR 🇧🇷
+
+O grave amassou tanto que o cidadão arregou 🔊🤣
+
+🚪 Vai pela sombra e não esquece:
+a tropa continua fazendo o chão tremer sem você.`
       )
       .setThumbnail(member.user.displayAvatarURL({ dynamic: true, size: 1024 }))
 
